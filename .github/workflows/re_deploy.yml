@@ -48,5 +48,5 @@ jobs:
       uses: azure/webapps-deploy@v3
       with:
         app-name: 'ipfl-training-academy'
-        # Publish profile is removed; the login step above handles auth
+        slot-name: 'production'
         package: .
