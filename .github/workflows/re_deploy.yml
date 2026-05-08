@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+# Required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -12,6 +17,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -33,8 +45,8 @@ jobs:
       run: npm run build
 
     - name: Deploy to Azure
-      uses: azure/webapps-deploy@v2
+      uses: azure/webapps-deploy@v3
       with:
         app-name: 'ipfl-training-academy'
-        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+        # Publish profile is removed; the login step above handles auth
         package: .
