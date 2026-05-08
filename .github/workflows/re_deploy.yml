@@ -33,7 +33,7 @@ jobs:
       run: npm run build
 
     - name: Deploy to Azure
-      uses: azure/webapps-deploy@v2
+      uses: azure/webapps-deploy@v3
       with:
         app-name: 'ipfl-training-academy'
         publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
