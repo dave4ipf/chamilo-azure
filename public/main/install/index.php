@@ -63,8 +63,8 @@ putenv('DATABASE_PORT=');
 putenv('DATABASE_NAME=');
 putenv('DATABASE_USER=');
 putenv('DATABASE_PASSWORD=');
-putenv('APP_ENV=dev');
-putenv('APP_DEBUG=1');
+putenv('APP_ENV=prod');
+putenv('APP_DEBUG=0');
 
 session_start();
 
@@ -432,6 +432,8 @@ if (isset($_POST['step2'])) {
             '{{DEFAULT_TEMPLATE}}' => 'default',
             '{{ADMIN_CHAMILO_ANNOUNCEMENTS_DISABLE}}' => '0',
             '{{SCIM_TOKEN}}' => ScimHelper::createToken(),
+            '{{APP_ENV}}' => 'prod',
+            '{{APP_DEBUG}}' => '0',
         ];
         error_log('Update env file');
         updateEnvFile($distFile, $envFile, $params);
@@ -733,6 +735,8 @@ if (isset($_POST['step2'])) {
                 '{{DEFAULT_TEMPLATE}}' => 'default',
                 '{{ADMIN_CHAMILO_ANNOUNCEMENTS_DISABLE}}' => '0',
                 '{{SCIM_TOKEN}}' => ScimHelper::createToken(),
+                '{{APP_ENV}}' => 'prod',
+                '{{APP_DEBUG}}' => '0',
             ];
 
             updateEnvFile($distFile, $envFile, $params);
@@ -740,7 +744,7 @@ if (isset($_POST['step2'])) {
 
             error_log('Load kernel');
             // Load Symfony Kernel
-            $kernel = new Kernel('dev', true);
+            $kernel = new Kernel('prod', false);
             $application = new Application($kernel);
 
             // Create database schema

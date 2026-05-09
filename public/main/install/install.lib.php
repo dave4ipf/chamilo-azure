@@ -2033,7 +2033,7 @@ function executeMigration(): array
 
         $dependency->getMetadataStorage()->ensureInitialized();
 
-        $env = $_SERVER['APP_ENV'] ?? 'dev';
+        $env = $_SERVER['APP_ENV'] ?? 'prod';
         $kernel = new Chamilo\Kernel($env, false);
         $kernel->boot();
 
