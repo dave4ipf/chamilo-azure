@@ -27,7 +27,14 @@ jobs:
     - name: Install PHP dependencies
       run: |
         composer install --no-dev --optimize-autoloader --no-scripts
-        # Manually install assets since we used --no-scripts
+        # Provide dummy env vars to allow Symfony to boot without a database
+        export DATABASE_HOST=127.0.0.1
+        export DATABASE_PORT=3306
+        export DATABASE_NAME=temp
+        export DATABASE_USER=temp
+        export DATABASE_PASSWORD=temp
+        export APP_SECRET=temp
+        export APP_ENV=prod
         php bin/console assets:install public
 
     - name: Setup Node
@@ -43,15 +50,22 @@ jobs:
 
     - name: Cleanup before deployment
       run: |
-        rm -rf node_modules
-        rm -rf .git
-        rm -rf assets
-        rm -rf tests
-        rm -f *.zip
-        rm -f hostingstart.html
-        # Ensure var directory is clean but exists
-        rm -rf var/cache/*
+        # Use || true to prevent 'Error 1' if files don't exist
+        rm -rf node_modules || true
+        rm -rf .git || true
+        rm -rf assets || true
+        rm -rf tests || true
+        rm -f *.zip || true
+        rm -f hostingstart.html || true
+        # REMOVE placeholder env files so Azure App Settings take over
+        rm -f .env || true
+        rm -f .env.dist || true
+        rm -f .env.test || true
+        # Clean cache but keep directory
+        rm -rf var/cache/* || true
         mkdir -p var/log
+        touch var/log/.gitkeep
+
 
     - name: Login to Azure (OIDC)
       uses: azure/login@v2
