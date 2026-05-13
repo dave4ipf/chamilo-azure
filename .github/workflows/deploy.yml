@@ -48,26 +48,39 @@ jobs:
     - name: Build frontend
       run: npm run build
 
-    - name: Cleanup before deployment
+    - name: Cleanup and Warmup
       run: |
-        # Use || true to prevent 'Error 1' if files don't exist
+        # Remove source/build artifacts we don't need in prod
         rm -rf node_modules || true
         rm -rf .git || true
         rm -rf assets || true
         rm -rf tests || true
         rm -f *.zip || true
         rm -f hostingstart.html || true
-        # REMOVE placeholder env files so Azure App Settings take over
+
+        # Remove placeholder envs so they don't interfere
         rm -f .env || true
         rm -f .env.dist || true
         rm -f .env.test || true
-        # Clean cache but keep directory
+
+        # Clean cache first
         rm -rf var/cache/* || true
         mkdir -p var/log
         touch var/log/.gitkeep
 
+        # Warm up cache (Generates Doctrine Proxies)
+        # We need these dummy vars so the Symfony kernel can boot
+        export DATABASE_HOST=127.0.0.1
+        export DATABASE_PORT=3306
+        export DATABASE_NAME=temp
+        export DATABASE_USER=temp
+        export DATABASE_PASSWORD=temp
+        export APP_SECRET=temp
+        export APP_ENV=prod
+        php bin/console cache:warmup --env=prod
 
     - name: Login to Azure (OIDC)
+
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
