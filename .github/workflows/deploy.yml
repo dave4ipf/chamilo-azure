@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -40,9 +44,16 @@ jobs:
     - name: Remove default Azure file
       run: rm -f hostingstart.html
 
+    - name: Login to Azure (OIDC)
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
     - name: Deploy to Azure
-      uses: azure/webapps-deploy@v2
+      uses: azure/webapps-deploy@v3
       with:
         app-name: 'ipfl-training-academy'
-        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
         package: .
+
